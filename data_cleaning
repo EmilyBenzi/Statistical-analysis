@@ -1,0 +1,43 @@
+library(readxl)
+
+###Data cleaning####
+
+#import the data and convert it into a dataframe
+raintab<-read_excel("/Users/emilybenzi/Desktop/R_group_project/rainfallindia.xlsx")
+View(raintab)  
+raindata<- as.data.frame(raintab)
+View(raindata)
+
+#Let's check the structure
+str(raindata)
+ncol(raindata)
+nrow(raindata)
+
+#rename columns
+names(raindata) <- c("state", "year", "jan", "feb", "mar", "apr", "may", "jun",
+                     "jul", "aug", "sep", "oct", "nov", "dec", "unit")
+
+#some numerical variables have the wrong class
+#let's change the class of the variables "jul", "nov" and "dec"
+raindata$jul <- as.numeric(raindata$jul)
+class(raindata$jul)
+raindata$nov <- as.numeric(raindata$nov)
+class(raindata$nov)
+raindata$dec <-as.numeric(raindata$dec)
+class(raindata$dec)
+
+#we have two different units of measurement
+#let's change the unit of measurement of Kerala from meters to millimeters
+#we need to multiply the data by 1000
+Kdatamm <- (raindata[raindata$state == "KERALA", c("jan", "feb","mar", "apr", "may", "jun",
+                                       "jul", "aug", "sep", "oct", "nov", "dec")])*1000
+
+raindata[raindata$state == "KERALA", c("jan", "feb","mar", "apr", "may", "jun",
+                                       "jul", "aug", "sep", "oct", "nov", "dec")] <- Kdatamm
+
+#now we can delete the "unit" column because all the data is in mm
+#stud.df <- studData[ , -c(1, ncol(studData))]
+raindata <- raindata[,-ncol(raindata)]
+
+#Export the cleaned dataset
+write.csv(raindata, "raindata_clean.csv", row.names = TRUE)
